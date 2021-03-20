@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="Polski-English-Wiktionary-v0">
+
+<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+    <!-- Title and language. -->
+    <dc:title>Polski → English</dc:title>
+    <dc:language>pl</dc:language>
+</metadata>
+
+<manifest>
+    <!-- Specify the names of the HTML file(s) and the cover image (JPEG or GIF). -->
+    <item id="DictBody" media-type="application/xhtml+xml" href="PL_EN_dict.html"></item>
+    <item id="DictCover" media-type="image/jpeg" href="PL_EN_dict.jpeg"/>
+</manifest>
+
+<!-- linear reading order -->
+<spine toc="My_Table_of_Contents">
+    <itemref idref="DictBody"/>
+</spine>
+
+<!-- Necessary for creating dictionaries.
+https://s3.amazonaws.com/kindlegen/AmazonKindlePublishingGuidelines.pdf#page=71 -->
+<x-metadata>
+    <!-- Specify the dictionary I/O languages. -->
+    <DictionaryInLanguage>pl</DictionaryInLanguage>
+    <DictionaryOutLanguage>en</DictionaryOutLanguage>
+    <DefaultLookupIndex>Polish</DefaultLookupIndex>
+</x-metadata> 
+
+</package>
