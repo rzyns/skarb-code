@@ -9,19 +9,12 @@ WIKTIONARY_ENTRIES_TO_IGNORE = [
     "character",
     "punct",
     "abbrev",
-    "conj",
     "det",
     "infix",
-    "intj",
-    "name",
-    "num",
     "particle",
     "phrase",
     "prefix",
-    "prep",
     "prep_phrase",
-    "pron",
-    "proverb",
     "suffix",
 ]
 
@@ -46,13 +39,12 @@ xmlns:idx="https://kindlegen.s3.amazonaws.com/AmazonKindlePublishingGuidelines.p
 DICTIONARY_GENERIC_ENTRY_TEMPLATE = """
 <idx:entry name="Polish" scriptable="yes" spell="yes">
 <idx:short><a id="{entry_id}"></a>
-<idx:orth>{word}
-<idx:infl>
+<idx:orth><b>{word}</b>
 {inflection_entries}
-</idx:infl>
 </idx:orth>
 <div><ol>{definitions}</ol></div>
 </idx:short>
+</idx:entry>
 """
 
 DICTIONARY_ENTRY_INFLECTION_TEMPLATE = """
@@ -92,15 +84,20 @@ for entry in wiktionary_data:
             base_form_entries[word].update(glosses)
 
 # Creating entries
-for i, (entry, definitions) in enumerate(base_form_entries.items(), start=1):
+enumerated_entries = enumerate(base_form_entries.items(), start=1)
+for i, (entry, definitions) in sorted(enumerated_entries, key=lambda x: x[1][0]):
     # Finding all inflected entries for base entry
     inflected_entries = form_of_entries.get(entry, {})
     inflected_entries_iforms = []
-    for entry, gloss in inflected_entries.items():
+    for inflected_entry, gloss in inflected_entries.items():
         inflected_entries_iforms.append(DICTIONARY_ENTRY_INFLECTION_TEMPLATE.format(
             inflection_type=gloss[0],
-            word=entry
+            word=inflected_entry
         ))
+    if inflected_entries_iforms:
+        # Add proper enclosing tags if we found inflected entries
+        inflected_entries_iforms.append("</idx:infl>")
+        inflected_entries_iforms.insert(0, "<idx:infl>")
 
     # Creating formatted entries
     definition_lis = []
@@ -118,7 +115,10 @@ for i, (entry, definitions) in enumerate(base_form_entries.items(), start=1):
     )
     all_entries.append(formatted_entry)
 
-dictionary_content = DICTIONARY_BODY_TEMPLATE.format("".join(all_entries))
+dictionary_content = DICTIONARY_BODY_TEMPLATE.format(dict_body="<hr>".join(all_entries))
+
+with open("PL_EN_dict.html", "w") as myfile:
+    myfile.write(dictionary_content)
 
 # Check all types of entries
 # abbrev: {"pos": "abbrev", "heads": [{"1": "pl", "2": "contraction", "template_name": "head"}], "word": "ze\u0144", "lang": "Polish", "lang_code": "pl", "sounds": [{"ipa": "/z\u025b\u0272/"}], "senses": [{"glosses": ["Contraction of z niego."], "tags": ["abbreviation", "alt-of", "contraction"], "alt_of": ["z niego"], "id": "ze\u0144-abbrev-mj4S8ufG"}, {"glosses": ["Contraction of z niej."], "tags": ["abbreviation", "alt-of", "contraction"], "alt_of": ["z niej"], "id": "ze\u0144-abbrev-MhzoEWR7"}]}
