@@ -1,11 +1,12 @@
-from collections import defaultdict
+from collections import defaultdict, namedtuple
+import morfeusz2
 import json
-import urllib
 
 # CONSTANTS
 KAIKKI_UNROLLED_WIKTIONARY_URL = "https://kaikki.org/dictionary/Polish/kaikki.org-dictionary-Polish.json"
 
 WIKTIONARY_ENTRIES_TO_IGNORE = [
+    "name",
     "character",
     "punct",
     "abbrev",
@@ -17,6 +18,26 @@ WIKTIONARY_ENTRIES_TO_IGNORE = [
     "prep_phrase",
     "suffix",
 ]
+
+MORFEUSZ_TAGS_TO_IGNORE = [
+    "wok",
+    "nwok",
+    "neg",
+    "depr",
+    "pun"
+    "nakc",
+    "aglt",
+    "adja",
+    "brev",
+    "pun",
+]
+
+MORFEUSZ_BAD_QUALIFS = [
+    "daw.",
+    "pisane_łącznie_z_przyimkiem",
+]
+
+MORFEUSZ_UNKNOWN_WORD_TAG = "ign"
 
 INFLECTED_FORM_STR = "form_of"
 
@@ -64,6 +85,7 @@ with open("../../Desktop/kaikki.org-dictionary-Polish.json", encoding="utf-8") a
 all_entries = []
 base_form_entries = defaultdict(set)
 form_of_entries = defaultdict(dict)
+bad_entries = {}
 
 # Discriminating between base and inflected/conjugated forms
 for entry in wiktionary_data:
@@ -83,7 +105,40 @@ for entry in wiktionary_data:
         else:
             base_form_entries[word].update(glosses)
 
-# Creating entries
+# Refining entries using Morfeusz
+morf = morfeusz2.Morfeusz(expand_tags=True)
+GeneratedEntry = namedtuple(
+    "GeneratedEntry", ["generated_form", "base_form", "tags", "frequency", "qualifiers"]
+)
+
+for entry in base_form_entries.keys():
+
+    # Only looking at one-word heads, not phrases
+    if len(entry.split(" ")) == 1:
+        generated = morf.generate(entry)
+        generated_named = [GeneratedEntry(*element) for element in generated]
+        for generated_entry in generated_named:
+            split_tags = generated_entry.tags.split(":")
+
+            for tag in split_tags:
+                # Flag anything that Morfeusz doesn't recognise - we can reuse it later to refine
+                # the head words
+                if tag == MORFEUSZ_UNKNOWN_WORD_TAG:
+                    bad_entries[entry] = generated_entry
+                # Skip tags for abbreviation, non-accepted forms, etc.
+                if tag in MORFEUSZ_TAGS_TO_IGNORE:
+                    continue
+
+            # Skip certain qualifiers that don't lead to useful derived forms
+            for qualif in MORFEUSZ_BAD_QUALIFS:
+                if qualif in generated_entry.qualifiers:
+                    continue
+
+            # Add anything that made it to this point to the inflected entries
+            if not form_of_entries[entry].get(generated_entry.generated_form):
+                form_of_entries[entry][generated_entry.generated_form] = [generated_entry.tags]
+
+# Creating entries from Wiktionary corpus
 enumerated_entries = enumerate(base_form_entries.items(), start=1)
 for i, (entry, definitions) in sorted(enumerated_entries, key=lambda x: x[1][0]):
     # Finding all inflected entries for base entry
@@ -114,6 +169,7 @@ for i, (entry, definitions) in sorted(enumerated_entries, key=lambda x: x[1][0])
         inflection_entries="".join(inflected_entries_iforms)
     )
     all_entries.append(formatted_entry)
+
 
 dictionary_content = DICTIONARY_BODY_TEMPLATE.format(dict_body="<hr>".join(all_entries))
 
@@ -154,3 +210,30 @@ with open("PL_EN_dict.html", "w") as myfile:
 # Plan how to handle more complex grammar (listing verb aspects?)
 # Plan how to add context to each entry
 # Plan how to add grammatical category to each meaning (inflgrp="{part_of_speech}")
+
+
+# P3/E2: Establish internal links for diminutive/augmentatives/derived
+# P3/E3: Add 
+# P2/E2: Add links between perfective and imperfective verbs
+# P2/E3: Start adding grammar categories for each head word
+# P2/E2: Start removing incorrect head words
+# P1/E1: Add derived forms from http://sgjp.pl
+
+
+# http://sgjp.pl scraping
+# Manual survey: 279978 lexemes
+# Url structure: http://sgjp.pl/edycja/ajax/get-entry/?lexeme_id=13589 (lexeme exists)
+# Url structure: http://sgjp.pl/edycja/ajax/inflection-tables/?lexeme_id=13589&variant=1 (lexeme contents)
+# 1. Fetch list of head words from dictionary, scrape in order until
+# you find all of them. Build offline mapping of page id to lexeme. Use AutoThrottling extension
+# to avoid crashing the site.
+# 2. For each head word, go to the appropriate lexeme detail page if it exists (build list of the ones
+# you didn't find - can be useful to exclude bad head words).
+# 3. Convert string response into HtmlResponse (provide encoding). Fetch required table data and word
+# class.
+# 4. Start updating dictionary of derived forms based on results (headword: {derived_word: [gloss]})
+
+
+# Only go for head words that have a single word
+# Exclude: wok, nwok, neg, depr, pun, ign, split on :
+# If it has "ign", flag it as it's probably a bad head word
