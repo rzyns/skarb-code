@@ -1,7 +1,7 @@
 # How to generate the dictionary
 
 * Tested on Ubuntu 18.04, Python 3.6
-* # `wget -qO - http://download.sgjp.pl/apt/sgjp.gpg.key | apt-key add -`
+* `wget -qO - http://download.sgjp.pl/apt/sgjp.gpg.key | apt-key add -`
 * `apt-add-repository http://download.sgjp.pl/apt/ubuntu`
 * `apt update`
 * `apt-get -y install morfeusz2`
