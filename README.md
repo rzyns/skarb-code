@@ -53,7 +53,7 @@
 ```
 # headword tag1, tag2
 # 	(etymology if present)
-# 	1. (category, other tags) meanin
+# 	1. (category, other tags) meaning
 # 	2. (category, other tags) meaning
 
 # (derived 1, derived 2, derived 3)
