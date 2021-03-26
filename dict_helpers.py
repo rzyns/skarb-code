@@ -1,13 +1,17 @@
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 import functools
 import morfeusz2
 import json
 from tqdm import tqdm
+import subprocess
 
 # CONSTANTS
 CORPUS_FILENAME = "kaikki.org-dictionary-Polish.json"
 DICTIONARY_HTML_FILENAME = "PL_EN_dict.html"
 LOCALE_NAME = "pl_PL.utf8"
+STATS_FILENAME = "dictionary_stats_{}.json"
+DISCARDE_ENTRIES_FILENAME = "discarded_entries_{}.json"
+
 
 WIKTIONARY_HEAD_WORD_TYPES_TO_IGNORE = [
     "name",
@@ -66,7 +70,7 @@ def sort_lemmas(lemmas):
     """
     import locale
     locale.setlocale(locale.LC_COLLATE, LOCALE_NAME)
-    return sorted(lemmas, key=lambda x: functools.cmp_to_key(locale.strcoll)(x.headword))
+    return sorted(lemmas, key=lambda lemma: functools.cmp_to_key(locale.strcoll)(lemma.headword))
 
 
 def load_corpus():
@@ -225,18 +229,30 @@ def extract_head_words(corpus_data):
     """
     Casts corpus data into Lemma objects
     """
+    discarded = {
+        "excluded_pos": [],
+        "empty_senses": [],
+        "entry_is_only_derived": [],
+        "excluded_pos_count": 0,
+        "empty_senses_count": 0,
+        "entry_is_only_derived_count": 0,
+    }
     all_lemmas = []
-    for entry in corpus_data:
+    for entry in tqdm(corpus_data, desc="Extracting head words..."):
         morph_cat = entry[CORPUS_MORPH_CAT_STR]
 
         # Bad morphological category, throw out
         if morph_cat in WIKTIONARY_HEAD_WORD_TYPES_TO_IGNORE:
+            discarded["excluded_pos"].append(entry)
+            discarded["excluded_pos_count"] += 1
             continue
 
         # For some reason the entry has no valid meanings, throw out
         # TODO: check these
         meanings = entry.get(CORPUS_MEANINGS_STR, [])
         if not meanings:
+            discarded["empty_senses"].append(entry)
+            discarded["empty_senses_count"] += 1
             continue
 
         word = entry[CORPUS_HEADWORD_STR]
@@ -246,12 +262,16 @@ def extract_head_words(corpus_data):
         if not lemma.is_only_derived_form:
             # Dictionary breaks if we don't exclude these, which
             # should anyway be replaced by Morfeusz
+            # TODO: try and reinclude 'diminutive' and other non-declined variants
             all_lemmas.append(lemma)
+        else:
+            discarded["entry_is_only_derived"].append(entry)
+            discarded["entry_is_only_derived_count"] += 1
 
-    return all_lemmas
+    return all_lemmas, discarded
 
 
-def create_html_dictionary():
+def create_html_dictionary(create_with_stats=False):
     DICTIONARY_BODY_TEMPLATE = """
     <html xmlns:math="http://exslt.org/math" xmlns:svg="http://www.w3.org/2000/svg"
     xmlns:tl="https://kindlegen.s3.amazonaws.com/AmazonKindlePublishingGuidelines.pdf"
@@ -268,17 +288,44 @@ def create_html_dictionary():
     </body>
     """
     corpus_data = load_corpus()
-    lemmas = tqdm(extract_head_words(corpus_data), desc="Extracting head words...")
+    lemmas, discarded_entries = extract_head_words(corpus_data)
     sorted_lemmas = sort_lemmas(lemmas)
     all_html_lemmas = []
     for i, lemma in tqdm(enumerate(sorted_lemmas, start=1), desc="Generating HTML entries..."):
         lemma_html = lemma.generate_lemma_html_entry(str(i))
-        # We get a few duplicates here?
         all_html_lemmas.append(lemma_html)
-    return DICTIONARY_BODY_TEMPLATE.format(dict_body="<hr>".join(all_html_lemmas))
+    dict_contents = DICTIONARY_BODY_TEMPLATE.format(
+        dict_body="<hr>".join(all_html_lemmas)
+    )
+    if create_with_stats:
+        write_dict_stats(sorted_lemmas, discarded_entries, dict_contents.count("\n"))
+    return dict_contents
 
-# should have 1236231 lines
-def write_html_dictionary():
-    html_dict = create_html_dictionary()
+
+def write_dict_stats(sorted_lemmas, discarded_entries, html_dict_len):
+    lemmas_per_letter = defaultdict(int)
+    for lemma in sorted_lemmas:
+        headword_initial = lemma.headword[0]
+        lemmas_per_letter[headword_initial] += 1
+    stats_dict = {
+        "lemmas_count": len(sorted_lemmas),
+        "lemmas_per_letter": dict(lemmas_per_letter),
+        "dict_lines": html_dict_len,
+        "discarded_entries_counts": {
+            key: value for key, value in discarded_entries.items() if key.endswith("count")
+        },
+    }
+    with open(STATS_FILENAME.format(fetch_current_git_hash()), "w", encoding="utf-8") as myfile:
+        myfile.write(json.dumps(stats_dict))
+    with open(DISCARDE_ENTRIES_FILENAME.format(fetch_current_git_hash()), "w", encoding="utf-8") as myfile:
+        myfile.write(json.dumps(discarded_entries))
+
+
+def fetch_current_git_hash():
+    return subprocess.check_output(["git", "describe", "--always"]).strip().decode()
+
+
+def write_html_dictionary(create_with_stats=False):
+    html_dict = create_html_dictionary(create_with_stats)
     with open(DICTIONARY_HTML_FILENAME, "w", encoding="utf-8") as myfile:
         myfile.write(html_dict)
