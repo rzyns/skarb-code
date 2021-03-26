@@ -75,8 +75,9 @@ def load_corpus():
     """
     corpus_data = []
     with open(CORPUS_FILENAME, encoding="utf-8") as myfile:
-        for line in myfile.readlines():
-            corpus_data.append(json.loads(line))
+        for line in tqdm(myfile.readlines(), desc="Loading corpus..."):
+            json_version = json.loads(line)
+            corpus_data.append(json_version)
     return corpus_data
 
 
@@ -96,6 +97,7 @@ class Lemma(object):
     <idx:orth><b>{word}</b>
     {inflection_entries}
     </idx:orth>
+    <div><i>{morph}</i></div>
     <div><ol>{definitions}</ol></div>
     </idx:short>
     </idx:entry>
@@ -206,6 +208,7 @@ class Lemma(object):
         return self.DICTIONARY_GENERIC_ENTRY_TEMPLATE.format(
             entry_id=str(dictionary_id),
             word=self.headword,
+            morph=self.morph_cat.capitalize(),
             definitions="".join(self.generate_definitions_html_list()),
             inflection_entries="".join(self.generate_derived_html_iforms())
         )
@@ -240,7 +243,10 @@ def extract_head_words(corpus_data):
 
         lemma = Lemma(word, morph_cat, meanings, entry)
 
-        all_lemmas.append(lemma)
+        if not lemma.is_only_derived_form:
+            # Dictionary breaks if we don't exclude these, which
+            # should anyway be replaced by Morfeusz
+            all_lemmas.append(lemma)
 
     return all_lemmas
 
@@ -265,7 +271,7 @@ def create_html_dictionary():
     lemmas = tqdm(extract_head_words(corpus_data), desc="Extracting head words...")
     sorted_lemmas = sort_lemmas(lemmas)
     all_html_lemmas = []
-    for i, lemma in tqdm(enumerate(sorted_lemmas), desc="Generating HTML entries..."):
+    for i, lemma in tqdm(enumerate(sorted_lemmas, start=1), desc="Generating HTML entries..."):
         lemma_html = lemma.generate_lemma_html_entry(str(i))
         # We get a few duplicates here?
         all_html_lemmas.append(lemma_html)
@@ -273,5 +279,6 @@ def create_html_dictionary():
 
 # should have 1236231 lines
 def write_html_dictionary():
-    with open(DICTIONARY_HTML_FILENAME, "w") as myfile:
-        myfile.write(create_html_dictionary())
+    html_dict = create_html_dictionary()
+    with open(DICTIONARY_HTML_FILENAME, "w", encoding="utf-8") as myfile:
+        myfile.write(html_dict)
