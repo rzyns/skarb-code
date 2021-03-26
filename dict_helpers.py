@@ -247,13 +247,7 @@ def extract_head_words(corpus_data):
             discarded["excluded_pos_count"] += 1
             continue
 
-        # For some reason the entry has no valid meanings, throw out
-        # TODO: check these
         meanings = entry.get(CORPUS_MEANINGS_STR, [])
-        if not meanings:
-            discarded["empty_senses"].append(entry)
-            discarded["empty_senses_count"] += 1
-            continue
 
         word = entry[CORPUS_HEADWORD_STR]
 
