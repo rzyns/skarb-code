@@ -20,7 +20,6 @@ if make_mobi_dict:
         [
             "./kindlegen",
             "./PL_EN_dict.opf",
-            "-c2",
             "-verbose",
             "-dont_append_source"
         ]

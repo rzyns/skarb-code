@@ -10,8 +10,9 @@ CORPUS_FILENAME = "kaikki.org-dictionary-Polish.json"
 DICTIONARY_HTML_FILENAME = "PL_EN_dict.html"
 LOCALE_NAME = "pl_PL.utf8"
 STATS_FILENAME = "dictionary_stats_{}.json"
-DISCARDE_ENTRIES_FILENAME = "discarded_entries_{}.json"
-
+DISCARDED_ENTRIES_FILENAME = "discarded_entries_{}.json"
+DISCARDED_INVALID_POS_VARNAME = "excluded_pos"
+DISCARDED_DERIVED_VARNAME = "entry_is_only_derived"
 
 WIKTIONARY_HEAD_WORD_TYPES_TO_IGNORE = [
     "name",
@@ -125,12 +126,12 @@ class Lemma(object):
             # TODO: check what exactly appears here
             if not definition:
                 continue
-            form_of = meaning.get(CORPUS_INFLECTED_FORM_STR, "")
+            form_of = meaning.get(CORPUS_INFLECTED_FORM_STR, [])
             definitions.append(
                 {
                     "definition": definition[0],
                     "derived": bool(form_of),
-                    "derived_from": form_of
+                    "derived_from": (form_of[0] if form_of else form_of)
                 }
             )
         return definitions
@@ -225,42 +226,54 @@ class Lemma(object):
         )
 
 
+def extract_corpus_entry_data(corpus_entry):
+    morph_cat = corpus_entry[CORPUS_MORPH_CAT_STR]
+    meanings = corpus_entry.get(CORPUS_MEANINGS_STR, [])
+    word = corpus_entry[CORPUS_HEADWORD_STR]
+    return morph_cat, meanings, word
+
+
+def check_lemma_is_invalid(lemma):
+    if lemma.morph_cat in WIKTIONARY_HEAD_WORD_TYPES_TO_IGNORE:
+        return DISCARDED_INVALID_POS_VARNAME
+    # TODO: check if you can recover 'diminutive' words
+    if lemma.is_only_derived_form:
+        return DISCARDED_DERIVED_VARNAME
+    return None
+
+
+def build_lemma_from_corpus_entry(corpus_entry):
+    morph_cat, meanings, headword = extract_corpus_entry_data(corpus_entry)
+    return Lemma(
+        headword=headword,
+        morph_cat=morph_cat,
+        meanings=meanings,
+        raw_corpus_entry=corpus_entry
+    )
+
+
 def extract_head_words(corpus_data):
     """
-    Casts corpus data into Lemma objects
+    Casts corpus data into Lemma objects, keeps track of discarded objects
     """
     discarded = {
-        "excluded_pos": [],
-        "empty_senses": [],
-        "entry_is_only_derived": [],
-        "excluded_pos_count": 0,
-        "empty_senses_count": 0,
-        "entry_is_only_derived_count": 0,
+        DISCARDED_INVALID_POS_VARNAME: [],
+        DISCARDED_DERIVED_VARNAME: [],
+        DISCARDED_INVALID_POS_VARNAME + "_count": 0,
+        DISCARDED_DERIVED_VARNAME + "_count": 0,
     }
     all_lemmas = []
     for entry in tqdm(corpus_data, desc="Extracting head words..."):
-        morph_cat = entry[CORPUS_MORPH_CAT_STR]
 
-        # Bad morphological category, throw out
-        if morph_cat in WIKTIONARY_HEAD_WORD_TYPES_TO_IGNORE:
-            discarded["excluded_pos"].append(entry)
-            discarded["excluded_pos_count"] += 1
+        lemma = build_lemma_from_corpus_entry(entry)
+
+        check = check_lemma_is_invalid(lemma)
+        if check:
+            discarded[check].append(entry)
+            discarded[check + "_count"] += 1
             continue
 
-        meanings = entry.get(CORPUS_MEANINGS_STR, [])
-
-        word = entry[CORPUS_HEADWORD_STR]
-
-        lemma = Lemma(word, morph_cat, meanings, entry)
-
-        if not lemma.is_only_derived_form:
-            # Dictionary breaks if we don't exclude these, which
-            # should anyway be replaced by Morfeusz
-            # TODO: try and reinclude 'diminutive' and other non-declined variants
-            all_lemmas.append(lemma)
-        else:
-            discarded["entry_is_only_derived"].append(entry)
-            discarded["entry_is_only_derived_count"] += 1
+        all_lemmas.append(lemma)
 
     return all_lemmas, discarded
 
@@ -311,7 +324,7 @@ def write_dict_stats(sorted_lemmas, discarded_entries, html_dict_len):
     }
     with open(STATS_FILENAME.format(fetch_current_git_hash()), "w", encoding="utf-8") as myfile:
         myfile.write(json.dumps(stats_dict))
-    with open(DISCARDE_ENTRIES_FILENAME.format(fetch_current_git_hash()), "w", encoding="utf-8") as myfile:
+    with open(DISCARDED_ENTRIES_FILENAME.format(fetch_current_git_hash()), "w", encoding="utf-8") as myfile:
         myfile.write(json.dumps(discarded_entries))
 
 

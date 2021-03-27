@@ -26,7 +26,7 @@
 * Google Translate (https://cloud.google.com/translate/pricing)
 
 # Technical
-* P1/E1: refactor generator code so that it's testable, write basic tests
+* ~~P1/E1: refactor generator code so that it's testable~~, write basic tests
 * P1/E?: Kindlegen needs a timeout to handle cases where the dict is malformed (else it parses
 * forever)
 * P1/E1: write integration test based on at least one page of a text

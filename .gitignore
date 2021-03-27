@@ -1,6 +1,9 @@
 # Project output
 *.html
 *.mobi
+dictionary_stats_*.json
+discarded_entries_*.json
+
 
 # Sublime
 *.sublime-project
