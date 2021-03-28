@@ -9,7 +9,7 @@
 * Install `virtualenvwrapper` (see (here)[https://medium.com/@aaditya.chhabra/virtualenv-with-virtualenvwrapper-on-ubuntu-34850ab9e765])
 * `mkvirtualenv -p python3.6 polski-english-dict`
 * `pip install -r requirements.txt`
-* `python make_dict.py`
+* `python make_dictionary.py stats make`
 
 # Product
 * P1/E3: Make sure that the search is on strict spelling to prevent ambiguity (ex: lęk for lek) via
