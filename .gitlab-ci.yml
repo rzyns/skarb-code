@@ -43,7 +43,6 @@ build_job:
     paths:
       - ./*.mobi
       - ./dictionary_stats_*.json
-      - ./discarded_entries_*.json
     expire_in: never
   timeout: 15m
   rules:
