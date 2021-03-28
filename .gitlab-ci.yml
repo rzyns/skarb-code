@@ -1,0 +1,45 @@
+image: ubuntu:18.04
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+# Pip's cache doesn't store the python packages
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
+#
+# If you want to also cache the installed packages, you have to install
+# them in a virtualenv and cache it as well.
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - apt update
+  - apt-get -y install wget gnupg2 software-properties-common python3.6 python3-pip
+  # Install locale for lemma sorting
+  - apt-get -y install language-pack-pl
+  # Install Morfeusz Ubuntu package
+  - wget -qO - http://download.sgjp.pl/apt/sgjp.gpg.key | apt-key add -
+  - apt-add-repository http://download.sgjp.pl/apt/ubuntu
+  - apt update
+  - apt-get -y install morfeusz2
+  - python -V
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+  - pip install -r requirements
+
+test:
+  script:
+    - pytest
+
+build:
+  script:
+    - python3 make_dictionary.py stats make
+  artifacts:
+    paths:
+      - ./*.mobi
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
