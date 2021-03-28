@@ -16,31 +16,31 @@
 * Exact-match Parameter (https://kdp.amazon.com/en_US/help/topic/G2HXJS944GL88DNV)
 * P1/E2: handle wiktionary particle, phrase, prep_phrase, investigate det
 * P1/E2: Start adding grammar categories for each head word
-* P2/E?: Proper sorting
-* P2/E2: Handle head words with multiple grammar categories (example: ) or multiple disinct meanings from different etims (f.e.: pies)
-* P2/E1: see if you can create new headwords from synonyms
+* P2/E?: ~~Proper lemma sorting~~
+* P2/E2: Handle head words with multiple grammar categories or multiple disinct meanings from different etims (f.e.: pies)
+* P2/E1: See if you can create new headwords from synonyms
 * P2/E2: Add links between perfective and imperfective verbs
 * P3/E2: Establish internal links for diminutive/augmentatives/derived
-* P3/E1: start looking into other dictionary formats
-* P3/E1: plug gaps in english version through a combination of wikisłównik e
+* P3/E1: Start looking into other dictionary formats
+* P3/E1: plug gaps in english version through a combination of Wikisłównik and
 * Google Translate (https://cloud.google.com/translate/pricing)
 
 # Technical
-* ~~P1/E1: refactor generator code so that it's testable~~, write basic tests
-* P1/E?: Kindlegen needs a timeout to handle cases where the dict is malformed (else it parses
-* forever)
+* ~~P1/E1: refactor generator code so that it's testable, write basic tests~~
+* ~~P1/E?: Kindlegen needs a timeout to handle cases where the dict is malformed (else it parses
+* forever)~~
 * P1/E1: write integration test based on at least one page of a text
-* P2/E3: buy appropriate domain
-* P2/E1: put together CI/CD pipeline on GitLab
-* P2/E1: make Gitlab build dictionary as pipeline artifact
+* ~~P2/E1: put together CI/CD pipeline on GitLab~~
+* ~~P2/E1: make Gitlab build dictionary as pipeline artifact~~
 * P2/E2: check if you can use new version of Kindlegen (requires switching to a Windows image)
 * P3/E1: autodeliver new build to cloud storage, update site
 
 # Sharing
-* P2/E1: put together basic website (static site generator, SSL, download via Google Drive)
+* ~~P2/E1: put together basic website (static site generator, SSL, download via Gitlab)~~
 * P2/E2: put together website copy and choose theme
 * P2/E1: document how to install the dictionary
-* P3/E1: document how you did the whole thing
+* P2/E3: buy appropriate domain
+* P3/E1: document how the whole thing is built
 
 # Test
 * P1: not highlightable words per page; missing words per page; wrong first choice; unclear definitions
@@ -71,10 +71,10 @@
 # Last manual test
 
 * Total words 96
-* Not highlightable
+* Not highlightable 0
 * Missing 6
 * Wrong choice 5
-* Unclear
+* Unclear 0
 
 # Entry types
 ```
