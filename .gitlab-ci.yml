@@ -1,3 +1,7 @@
+stages:
+  - test
+  - build
+
 image: ubuntu:18.04
 
 # Change pip's cache directory to be inside the project directory since we can
@@ -25,21 +29,24 @@ before_script:
   - apt-add-repository http://download.sgjp.pl/apt/ubuntu
   - apt update
   - apt-get -y install morfeusz2
-  - python -V
-  - pip install virtualenv
+  - python3 -V
+  - pip3 install virtualenv
   - virtualenv venv
   - source venv/bin/activate
   - pip install -r requirements
 
-test:
+test_job:
+  stage: test
   script:
     - pytest
 
-build:
+build_job:
+  stage: build
   script:
     - python3 make_dictionary.py stats make
   artifacts:
     paths:
       - ./*.mobi
+    expire_in: never
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
