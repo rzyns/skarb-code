@@ -33,7 +33,7 @@ before_script:
   - pip3 install virtualenv
   - virtualenv venv
   - source venv/bin/activate
-  - pip install -r requirements
+  - pip install -r requirements.txt
 
 test_job:
   stage: test
@@ -47,6 +47,8 @@ build_job:
   artifacts:
     paths:
       - ./*.mobi
+      - ./*.json
     expire_in: never
+  timeout: 15m
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
