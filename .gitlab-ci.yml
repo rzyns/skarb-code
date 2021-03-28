@@ -9,19 +9,16 @@ image: ubuntu:18.04
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
-# Pip's cache doesn't store the python packages
-# https://pip.pypa.io/en/stable/reference/pip_install/#caching
-#
-# If you want to also cache the installed packages, you have to install
-# them in a virtualenv and cache it as well.
+# Caching pip and apt packages
 cache:
   paths:
     - .cache/pip
     - venv/
+    - /var/cache/apt/
 
 before_script:
   - apt update
-  - apt-get -y install wget gnupg2 software-properties-common python3.6 python3-pip
+  - apt-get -y install wget gnupg2 software-properties-common python3.6 python3-pip git
   # Install locale for lemma sorting
   - apt-get -y install language-pack-pl
   # Install Morfeusz Ubuntu package
