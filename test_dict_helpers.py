@@ -311,8 +311,8 @@ def test_lemma_definitions():
 def test_lemma_generate_lemma_html_entry():
     entry = TEST_FULL_NOUN_ENTRY
     lemma = build_lemma_from_corpus_entry(entry)
-    assert lemma.generate_lemma_html_entry(1) == '\n    <idx:entry name="Polish" scriptable="yes" spell="yes">' +\
-        '\n    <idx:short><a id="1"></a>' +\
+    assert lemma.generate_lemma_html_entry() == '\n    <idx:entry name="Polish" scriptable="yes" spell="yes">' +\
+        '\n    <idx:short><a id="0"></a>' +\
         '\n    <idx:orth><b>pies</b>' +\
         '\n    <idx:infl>' +\
         '\n    <idx:iform name="subst:sg:nom:m2" value="pies"/></idx:iform>' +\
@@ -334,5 +334,6 @@ def test_lemma_generate_lemma_html_entry():
         '\n    \n    <li>A male dog.</li>' +\
         '\n    \n    <li>A male fox or badger.</li>' +\
         '\n    </ol></div>' +\
+        '\n    ' +\
         '\n    </idx:short>' +\
         '\n    </idx:entry>\n    '

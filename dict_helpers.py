@@ -13,6 +13,14 @@ STATS_FILENAME = "dictionary_stats_{}.json"
 DISCARDED_ENTRIES_FILENAME = "discarded_entries_{}.json"
 DISCARDED_INVALID_POS_VARNAME = "excluded_pos"
 DISCARDED_DERIVED_VARNAME = "entry_is_only_derived"
+CORPUS_MORPH_CAT_VERB_STR = "verb"
+VERBS_TAG_MAPPING = {
+    "perfective": "pf",
+    "imperfective": "impf",
+    "frequentative": "fq",
+    "transitive": "trans",
+    "intransitive": "intrans",
+}
 
 WIKTIONARY_HEAD_WORD_TYPES_TO_IGNORE = [
     "name",
@@ -88,12 +96,13 @@ def load_corpus():
 
 class Lemma(object):
     """Class encapsulating all required data for a dictionary entry"""
-    def __init__(self, headword, morph_cat, meanings, raw_corpus_entry):
+    def __init__(self, headword, morph_cat, meanings, dictionary_id, raw_corpus_entry):
         super(Lemma, self).__init__()
         self.headword = headword
         self.morph_cat = morph_cat
         self.meanings = meanings
         self.raw_corpus_entry = raw_corpus_entry
+        self.dictionary_id = dictionary_id
         self.inflected_forms = []
 
     DICTIONARY_GENERIC_ENTRY_TEMPLATE = """
@@ -104,6 +113,7 @@ class Lemma(object):
     </idx:orth>
     <div><i>{morph}</i></div>
     <div><ol>{definitions}</ol></div>
+    {verb_aspect}
     </idx:short>
     </idx:entry>
     """
@@ -114,6 +124,10 @@ class Lemma(object):
 
     DICTIONARY_DEFINITIONS_ENTRY_TEMPLATE = """
     <li>{definition}</li>
+    """
+
+    DICTIONARY_VERB_ASPECT_ENTRY_TEMPLATE = """
+    <div>{aspect_tag} form: <a href="{other_id}">{other_aspect_headword}</a></div>
     """
 
     MORFEUSZ_OBJ = morfeusz2.Morfeusz(expand_tags=True)
@@ -209,16 +223,46 @@ class Lemma(object):
             )
         return definitions_html_list
 
-    def generate_lemma_html_entry(self, dictionary_id):
+    def find_alternative_aspect_data(self):
+        if self.morph_cat == CORPUS_MORPH_CAT_VERB_STR:
+            other_aspect = self.raw_corpus_entry.get("forms", [])
+            if other_aspect:
+                form = other_aspect[0].get("form")
+                tag = other_aspect[0].get("tags", [])
+                if form and tag:
+                    tag = tag[0]
+                    return form, tag
+        return "", ""
+
+    def find_alternative_aspect(self, lemma_verb_dict={}):
+        alternative_aspect_id = ""
+        form, tag = self.find_alternative_aspect_data()
+        if form and tag:
+            alternative_aspect_lemma = lemma_verb_dict.get(form)
+            if alternative_aspect_lemma:
+                alternative_aspect_id = alternative_aspect_lemma.dictionary_id
+        return form, tag, alternative_aspect_id
+
+    def generate_lemma_html_entry(self, lemma_verb_dict={}):
+        verb_aspect_str = ""
+        form, tag, alternative_aspect_id = self.find_alternative_aspect()
+        if form and tag:
+            verb_aspect_str = self.DICTIONARY_VERB_ASPECT_ENTRY_TEMPLATE.format(
+                aspect_tag=tag,
+                other_id=alternative_aspect_id,
+                other_aspect_headword=form,
+            )
+
         return self.DICTIONARY_GENERIC_ENTRY_TEMPLATE.format(
-            entry_id=str(dictionary_id),
+            entry_id=self.dictionary_id,
             word=self.headword,
             morph=self.morph_cat.capitalize(),
             definitions="".join(self.generate_definitions_html_list()),
-            inflection_entries="".join(self.generate_derived_html_iforms())
+            inflection_entries="".join(self.generate_derived_html_iforms()),
+            verb_aspect=verb_aspect_str
         )
 
-    def __str__(self):
+    def __unicode__(self):
         return "{} - {} - {}".format(
             self.headword,
             self.morph_cat,
@@ -242,13 +286,27 @@ def check_lemma_is_invalid(lemma):
     return None
 
 
-def build_lemma_from_corpus_entry(corpus_entry):
+def build_verb_lemma_dictionary(lemma_list):
+    """
+    This is used to find and generate entries for linked perfective/imperfective/iterative forms.
+    Note that there are multiple verbs in the dictionary that have more than one entry with the
+    same headword, so this'll always be a best guess.
+    """
+    verb_lemma_dict = {}
+    for lemma in lemma_list:
+        if lemma.morph_cat == CORPUS_MORPH_CAT_VERB_STR:
+            verb_lemma_dict[lemma.headword] = lemma
+    return verb_lemma_dict
+
+
+def build_lemma_from_corpus_entry(corpus_entry, dictionary_id=0):
     morph_cat, meanings, headword = extract_corpus_entry_data(corpus_entry)
     return Lemma(
         headword=headword,
         morph_cat=morph_cat,
         meanings=meanings,
-        raw_corpus_entry=corpus_entry
+        raw_corpus_entry=corpus_entry,
+        dictionary_id=str(dictionary_id)
     )
 
 
@@ -263,9 +321,9 @@ def extract_head_words(corpus_data):
         DISCARDED_DERIVED_VARNAME + "_count": 0,
     }
     all_lemmas = []
-    for entry in tqdm(corpus_data, desc="Extracting head words..."):
+    for i, entry in tqdm(enumerate(corpus_data, start=1), desc="Extracting head words..."):
 
-        lemma = build_lemma_from_corpus_entry(entry)
+        lemma = build_lemma_from_corpus_entry(entry, i)
 
         check = check_lemma_is_invalid(lemma)
         if check:
@@ -297,9 +355,10 @@ def create_html_dictionary(create_with_stats=False):
     corpus_data = load_corpus()
     lemmas, discarded_entries = extract_head_words(corpus_data)
     sorted_lemmas = sort_lemmas(lemmas)
+    lemma_verb_dict = build_verb_lemma_dictionary(sort_lemmas)
     all_html_lemmas = []
-    for i, lemma in tqdm(enumerate(sorted_lemmas, start=1), desc="Generating HTML entries..."):
-        lemma_html = lemma.generate_lemma_html_entry(str(i))
+    for lemma in tqdm(sorted_lemmas, desc="Generating HTML entries..."):
+        lemma_html = lemma.generate_lemma_html_entry(lemma_verb_dict)
         all_html_lemmas.append(lemma_html)
     dict_contents = DICTIONARY_BODY_TEMPLATE.format(
         dict_body="<hr>".join(all_html_lemmas)
