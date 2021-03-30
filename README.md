@@ -12,8 +12,7 @@
 * `python make_dictionary.py stats make`
 
 # Product
-* P1/E3: Make sure that the search is on strict spelling to prevent ambiguity (ex: lęk for lek) via
-* Exact-match Parameter (https://kdp.amazon.com/en_US/help/topic/G2HXJS944GL88DNV)
+* P1/E3: Make sure that the search is on strict spelling to prevent ambiguity (ex: lęk for lek) via Exact-match Parameter (https://kdp.amazon.com/en_US/help/topic/G2HXJS944GL88DNV)
 * P1/E2: handle wiktionary particle, phrase, prep_phrase, investigate det
 * P1/E2: ~~Start adding grammar categories for each head word~~
 * P2/E?: ~~Proper lemma sorting~~
@@ -32,15 +31,16 @@
 * P1/E1: write integration test based on at least one page of a text
 * P2/E1: ~~put together CI/CD pipeline on GitLab~~
 * P2/E1: ~~make Gitlab build dictionary as pipeline artifact~~
-* P2/E2: check if you can use new version of Kindlegen (requires switching to a Windows image)
+* P2/E2: check if you can use command-line version of Kindle Previewer (requires switching to a Windows image)
 * P3/E1: autodeliver new build to cloud storage, update site
 
 # Sharing
+* P1/E3: ~~fix license file~~
 * P2/E1: ~~put together basic website (static site generator, SSL, download via Gitlab)~~
-* P2/E2: put together website copy and choose theme
-* P2/E1: document how to install the dictionary
+* P2/E2: ~~put together website copy and choose theme~~
+* P2/E1: ~~document how to install the dictionary~~
 * P2/E3: buy appropriate domain
-* P3/E1: document how the whole thing is built
+* P3/E1: ~~document how the whole thing is built~~
 
 # Test
 * P1: not highlightable words per page; missing words per page; wrong first choice; unclear definitions
