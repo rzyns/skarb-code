@@ -315,16 +315,16 @@ def test_lemma_generate_lemma_html_entry():
         '\n    <idx:orth><b>pies</b>' +\
         '\n    <idx:infl>' +\
         '\n    <idx:iform name="subst:sg:nom:m2" value="pies"/></idx:iform>' +\
-        '\n    \n    <idx:iform name="subst:sg:gen:m2" value="psa"/></idx:iform>' +\
-        '\n    \n    <idx:iform name="subst:sg:dat:m2" value="psu"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="subst:sg:acc:m2" value="psa"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="subst:pl:loc:m2" value="psach"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="subst:pl:inst:m2" value="psami"/></idx:iform>' +\
         '\n    \n    <idx:iform name="subst:sg:inst:m2" value="psem"/></idx:iform>' +\
         '\n    \n    <idx:iform name="subst:sg:loc:m2" value="psie"/></idx:iform>' +\
-        '\n    \n    <idx:iform name="subst:pl:nom:m2" value="psy"/></idx:iform>' +\
-        '\n    \n    <idx:iform name="subst:pl:gen:m2" value="psów"/></idx:iform>' +\
         '\n    \n    <idx:iform name="subst:pl:dat:m2" value="psom"/></idx:iform>' +\
-        '\n    \n    <idx:iform name="subst:pl:inst:m2" value="psami"/></idx:iform>' +\
-        '\n    \n    <idx:iform name="subst:pl:loc:m2" value="psach"/></idx:iform>' +\
         '\n    \n    <idx:iform name="subst:pl:nom:m1" value="psowie"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="subst:sg:dat:m2" value="psu"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="subst:pl:acc:m2" value="psy"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="subst:pl:gen:m2" value="psów"/></idx:iform>' +\
         '\n    </idx:infl>' +\
         '\n    </idx:orth>' +\
         '\n    <div><i>Noun</i></div>' +\

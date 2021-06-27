@@ -187,7 +187,7 @@ class Lemma(object):
         generated = self.MORFEUSZ_OBJ.generate(self.headword)
         generated_named = [GeneratedEntry(*element) for element in generated]
 
-        for generated_word in generated_named:
+        for generated_word in sorted(generated_named):
             keep = True
             split_tags = generated_word.tags.split(":")
 
