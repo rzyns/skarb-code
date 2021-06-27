@@ -7,7 +7,8 @@ import subprocess
 
 # CONSTANTS
 CORPUS_FILENAME = "kaikki.org-dictionary-Polish.json"
-DICTIONARY_HTML_FILENAME = "PL_EN_dict.html"
+MACHINE_TRANSLATED_CORPUS_FILENAME = "machine_translated_corpus.json"
+DICTIONARY_HTML_FILENAME = "PL_EN_dict{}.html"
 LOCALE_NAME = "pl_PL.utf8"
 STATS_FILENAME = "dictionary_stats_{}.json"
 DISCARDED_ENTRIES_FILENAME = "discarded_entries_{}.json"
@@ -63,6 +64,21 @@ CORPUS_MEANINGS_STR = "senses"
 CORPUS_DEFINITION_STR = "glosses"
 
 
+SGJP_MORPH_CATEGORY_MAPPING = {
+    "rz.": "noun",
+    "cz.": "verb",
+    "przym.": "adj"
+}
+MACHINE_TRANSLATED_MESSAGE = "<div><i>Translation generated with Google Cloud Translate API</i></div>"
+SAFE_DICT_CHUNK = 25000
+
+
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+
 def sort_headwords(word_list):
     """
     Make sure a list of words is put in proper ascending
@@ -96,7 +112,7 @@ def load_corpus():
 
 class Lemma(object):
     """Class encapsulating all required data for a dictionary entry"""
-    def __init__(self, headword, morph_cat, meanings, dictionary_id, raw_corpus_entry):
+    def __init__(self, headword, morph_cat, meanings, dictionary_id, raw_corpus_entry, machine_translated=""):
         super(Lemma, self).__init__()
         self.headword = headword
         self.morph_cat = morph_cat
@@ -104,6 +120,7 @@ class Lemma(object):
         self.raw_corpus_entry = raw_corpus_entry
         self.dictionary_id = dictionary_id
         self.inflected_forms = []
+        self.machine_translated = machine_translated
 
     DICTIONARY_GENERIC_ENTRY_TEMPLATE = """
     <idx:entry name="Polish" scriptable="yes" spell="yes">
@@ -114,6 +131,7 @@ class Lemma(object):
     <div><i>{morph}</i></div>
     <div><ol>{definitions}</ol></div>
     {verb_aspect}
+    {machine_translated}
     </idx:short>
     </idx:entry>
     """
@@ -259,7 +277,8 @@ class Lemma(object):
             morph=self.morph_cat.capitalize(),
             definitions="".join(self.generate_definitions_html_list()),
             inflection_entries="".join(self.generate_derived_html_iforms()),
-            verb_aspect=verb_aspect_str
+            verb_aspect=verb_aspect_str,
+            machine_translated=self.machine_translated
         )
 
     def __unicode__(self):
@@ -336,7 +355,36 @@ def extract_head_words(corpus_data):
     return all_lemmas, discarded
 
 
-def create_html_dictionary(create_with_stats=False):
+def add_machine_translated_lemmas(machine_translated_corpus, base_lemmas):
+    """
+    Adds machine-translated corpus from SGJP/GCP Translate API, prioritises base lemmas
+    """
+    existing_lemmas_headwords = set([lemma.headword for lemma in base_lemmas])
+    duplicate = 0
+    no_trans = 0
+    for item in tqdm(machine_translated_corpus):
+        # Discard duplicates, Wiktionary entries will generally be of better quality
+        if item["entry"] in existing_lemmas_headwords:
+            duplicate += 1
+            continue
+        # Discard cases where the translation doesn't add anything
+        if item["entry"].lower() == item.get("translation", "").lower():
+            no_trans += 1
+            continue
+        lemma = Lemma(
+            headword=item["entry"],
+            morph_cat=SGJP_MORPH_CATEGORY_MAPPING.get(item["abbr_pos"], ""),
+            meanings=[{CORPUS_DEFINITION_STR: [item.get("translation", [])]}],
+            machine_translated=MACHINE_TRANSLATED_MESSAGE,
+            raw_corpus_entry={},
+            dictionary_id=0
+        )
+        base_lemmas.append(lemma)
+    print("Duplicate: {}, no translation: {}".format(str(duplicate), str(no_trans)))
+    return base_lemmas
+
+
+def create_html_dictionary(create_with_stats=False, write=True):
     DICTIONARY_BODY_TEMPLATE = """
     <html xmlns:math="http://exslt.org/math" xmlns:svg="http://www.w3.org/2000/svg"
     xmlns:tl="https://kindlegen.s3.amazonaws.com/AmazonKindlePublishingGuidelines.pdf"
@@ -354,18 +402,25 @@ def create_html_dictionary(create_with_stats=False):
     """
     corpus_data = load_corpus()
     lemmas, discarded_entries = extract_head_words(corpus_data)
+    machine_translated_corpus = read_machine_translated_corpus()
+    lemmas = add_machine_translated_lemmas(machine_translated_corpus, lemmas)
     sorted_lemmas = sort_lemmas(lemmas)
-    lemma_verb_dict = build_verb_lemma_dictionary(sort_lemmas)
-    all_html_lemmas = []
-    for lemma in tqdm(sorted_lemmas, desc="Generating HTML entries..."):
-        lemma_html = lemma.generate_lemma_html_entry(lemma_verb_dict)
-        all_html_lemmas.append(lemma_html)
-    dict_contents = DICTIONARY_BODY_TEMPLATE.format(
-        dict_body="<hr>".join(all_html_lemmas)
-    )
+    lemma_verb_dict = build_verb_lemma_dictionary(sorted_lemmas)
+    split_lemma_chunks = chunks(sorted_lemmas, SAFE_DICT_CHUNK)
+    for i, chunk in enumerate(split_lemma_chunks, start=1):
+        all_html_lemmas = []
+        str_index = str(i)
+        for lemma in tqdm(chunk, desc="Generating HTML entries for chunk {}...".format(str_index)):
+            lemma_html = lemma.generate_lemma_html_entry(lemma_verb_dict)
+            all_html_lemmas.append(lemma_html)
+        dict_contents = DICTIONARY_BODY_TEMPLATE.format(
+            dict_body="<hr>".join(all_html_lemmas)
+        )
+        if write:
+            write_html_dictionary_chunk(dict_contents, str_index)
     if create_with_stats:
         write_dict_stats(sorted_lemmas, discarded_entries, dict_contents.count("\n"))
-    return dict_contents
+    return sorted_lemmas, lemma_verb_dict
 
 
 def write_dict_stats(sorted_lemmas, discarded_entries, html_dict_len):
@@ -392,6 +447,15 @@ def fetch_current_git_hash():
 
 
 def write_html_dictionary(create_with_stats=False):
-    html_dict = create_html_dictionary(create_with_stats)
-    with open(DICTIONARY_HTML_FILENAME, "w", encoding="utf-8") as myfile:
+    create_html_dictionary(create_with_stats, True)
+
+
+def write_html_dictionary_chunk(html_dict, chunk_no):
+    with open(DICTIONARY_HTML_FILENAME.format(chunk_no), "w", encoding="utf-8") as myfile:
         myfile.write(html_dict)
+
+
+def read_machine_translated_corpus():
+    with open(MACHINE_TRANSLATED_CORPUS_FILENAME, "r", encoding="utf-8") as myfile:
+        corpus = json.loads(myfile.read())
+    return corpus

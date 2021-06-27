@@ -21,13 +21,11 @@
 * P2/E2: Add links between perfective and imperfective verbs
 * P3/E2: Establish internal links for diminutive/augmentatives/derived
 * P3/E1: Start looking into other dictionary formats
-* P3/E1: plug gaps in english version through a combination of Wikisłównik and
-* Google Translate (https://cloud.google.com/translate/pricing)
+* P3/E1: plug gaps in english version through a combination of Wikisłównik and Google Translate (https://cloud.google.com/translate/pricing)
 
 # Technical
 * P1/E1: ~~refactor generator code so that it's testable, write basic tests~~
-* P1/E?: ~~Kindlegen needs a timeout to handle cases where the dict is malformed (else it parses
-* forever)~~
+* P1/E?: ~~Kindlegen needs a timeout to handle cases where the dict is malformed (else it parses forever)~~
 * P1/E1: write integration test based on at least one page of a text
 * P2/E1: ~~put together CI/CD pipeline on GitLab~~
 * P2/E1: ~~make Gitlab build dictionary as pipeline artifact~~
@@ -39,8 +37,9 @@
 * P2/E1: ~~put together basic website (static site generator, SSL, download via Gitlab)~~
 * P2/E2: ~~put together website copy and choose theme~~
 * P2/E1: ~~document how to install the dictionary~~
-* P2/E3: buy appropriate domain
+* P2/E3: ~~buy appropriate domain~~
 * P3/E1: ~~document how the whole thing is built~~
+* P2/E2: GDPR handling (https://liatas.com/posts/hugo-gdpr-cookie-consent-banner/)
 
 # Test
 * P1: not highlightable words per page; missing words per page; wrong first choice; unclear definitions

@@ -5,7 +5,6 @@ from dict_helpers import (
     DISCARDED_DERIVED_VARNAME,
     extract_corpus_entry_data,
     extract_head_words,
-    Lemma,
     sort_headwords,
     WIKTIONARY_HEAD_WORD_TYPES_TO_IGNORE,
 )
@@ -334,6 +333,7 @@ def test_lemma_generate_lemma_html_entry():
         '\n    \n    <li>A male dog.</li>' +\
         '\n    \n    <li>A male fox or badger.</li>' +\
         '\n    </ol></div>' +\
+        '\n    ' +\
         '\n    ' +\
         '\n    </idx:short>' +\
         '\n    </idx:entry>\n    '

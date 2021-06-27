@@ -31,7 +31,7 @@ Data extracted from Wiktionary is used under the terms of the Creative Commons A
 * https://creativecommons.org/licenses/by-sa/3.0/
 
 
-`morfeusz2` license
+`morfeusz2` and SGJP license
 ---
 
 * The copyright holder of Morfeusz 2 (the program) is Institute of Computer Science PAS.
@@ -54,3 +54,8 @@ Kindlegen copyright notice
 Amazon kindlegen(Linux) V2.9 build 1028-0897292
 A command line e-book compiler
 Copyright Amazon.com and its Affiliates 2014
+
+
+Google Translate attribution notice
+---
+THIS SERVICE CONTAINS TRANSLATIONS POWERED BY GOOGLE. GOOGLE DISCLAIMS ALL WARRANTIES RELATED TO THE TRANSLATIONS, EXPRESS OR IMPLIED, INCLUDING ANY WARRANTIES OF ACCURACY, RELIABILITY, AND ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
