@@ -340,9 +340,9 @@ def extract_head_words(corpus_data):
         DISCARDED_DERIVED_VARNAME + "_count": 0,
     }
     all_lemmas = []
-    for i, entry in tqdm(enumerate(corpus_data, start=1), desc="Extracting head words..."):
+    for i, entry in tqdm(enumerate(corpus_data), desc="Extracting head words..."):
 
-        lemma = build_lemma_from_corpus_entry(entry, i)
+        lemma = build_lemma_from_corpus_entry(entry)
 
         check = check_lemma_is_invalid(lemma)
         if check:
@@ -405,6 +405,8 @@ def create_html_dictionary(create_with_stats=False, write=True):
     machine_translated_corpus = read_machine_translated_corpus()
     lemmas = add_machine_translated_lemmas(machine_translated_corpus, lemmas)
     sorted_lemmas = sort_lemmas(lemmas)
+    for i, lemma in enumerate(sorted_lemmas, start=1):
+        setattr(lemma, 'dictionary_id', str(i))
     lemma_verb_dict = build_verb_lemma_dictionary(sorted_lemmas)
     split_lemma_chunks = chunks(sorted_lemmas, SAFE_DICT_CHUNK)
     for i, chunk in enumerate(split_lemma_chunks, start=1):
