@@ -1,6 +1,6 @@
 # How to generate the dictionary
 
-* Tested on Ubuntu 18.04, Python 3.6
+* Tested on Ubuntu 18.04/Python 3.6
 * `wget -qO - http://download.sgjp.pl/apt/sgjp.gpg.key | apt-key add -`
 * `apt-add-repository http://download.sgjp.pl/apt/ubuntu`
 * `apt update`
@@ -19,9 +19,9 @@
 * P2/E2: ~~Handle head words with multiple grammar categories or multiple disinct meanings from different etims (f.e.: pies)~~
 * P2/E1: See if you can create new headwords from synonyms
 * P2/E2: Add links between perfective and imperfective verbs
-* P3/E2: Establish internal links for diminutive/augmentatives/derived
+* P3/E2: Establish internal links for diminutive/augmentatives/derived forms
 * P3/E1: Start looking into other dictionary formats
-* P3/E1: plug gaps in english version through a combination of Wikisłównik and Google Translate (https://cloud.google.com/translate/pricing)
+* P3/E1: ~~plug gaps in english version through a combination of Wikisłównik and Google Translate (https://cloud.google.com/translate/)~~
 
 # Technical
 * P1/E1: ~~refactor generator code so that it's testable, write basic tests~~
@@ -39,7 +39,7 @@
 * P2/E1: ~~document how to install the dictionary~~
 * P2/E3: ~~buy appropriate domain~~
 * P3/E1: ~~document how the whole thing is built~~
-* P2/E2: GDPR handling (https://liatas.com/posts/hugo-gdpr-cookie-consent-banner/)
+* P2/E2: ~~basic GDPR handling (https://liatas.com/posts/hugo-gdpr-cookie-consent-banner/)~~
 
 # Test
 * P1: not highlightable words per page; missing words per page; wrong first choice; unclear definitions
