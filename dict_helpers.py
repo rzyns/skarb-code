@@ -187,7 +187,7 @@ class Lemma(object):
         generated = self.MORFEUSZ_OBJ.generate(self.headword)
         generated_named = [GeneratedEntry(*element) for element in generated]
 
-        for generated_word in sorted(generated_named):
+        for generated_word in generated_named:
             keep = True
             split_tags = generated_word.tags.split(":")
 
@@ -212,12 +212,16 @@ class Lemma(object):
             # making sure only unique values are added as Morfeusz has a tendency to
             # generate tons of duplicates
             if generated_word.generated_form not in derived_words_check and keep:
+                # There seems to be something non-deterministic or environment- or version-dependent
+                # in the way in which these 'm' tags are produced so getting rid of them
+                tags_to_keep = [tag for tag in split_tags if tag not in ("m1", "m2", "m3")]
+                tags_to_keep_formatted = ":".join(tags_to_keep)
                 derived_words_check.add(generated_word.generated_form)
                 derived_words.append(
-                    {"derived_form": generated_word.generated_form, "tags": generated_word.tags}
+                    {"derived_form": generated_word.generated_form, "tags": tags_to_keep_formatted}
                 )
 
-        return derived_words
+        return sorted(derived_words, key=lambda x: x["derived_form"])
 
     def generate_derived_html_iforms(self):
         derived_iforms = []
