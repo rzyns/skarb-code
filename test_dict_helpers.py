@@ -307,7 +307,7 @@ def test_lemma_definitions():
     ]
 
 
-def test_lemma_generate_lemma_html_entry():
+def test_lemma_generate_noun_lemma_html_entry():
     entry = TEST_FULL_NOUN_ENTRY
     lemma = build_lemma_from_corpus_entry(entry)
     assert lemma.generate_lemma_html_entry() == '\n    <idx:entry name="Polish" scriptable="yes" spell="yes">' +\
@@ -315,16 +315,16 @@ def test_lemma_generate_lemma_html_entry():
         '\n    <idx:orth><b>pies</b>' +\
         '\n    <idx:infl>' +\
         '\n    <idx:iform name="subst:sg:nom" value="pies"/></idx:iform>' +\
-        '\n    \n    <idx:iform name="subst:sg:gen" value="psa"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="subst:sg:gen.acc" value="psa"/></idx:iform>' +\
         '\n    \n    <idx:iform name="subst:pl:loc" value="psach"/></idx:iform>' +\
         '\n    \n    <idx:iform name="subst:pl:inst" value="psami"/></idx:iform>' +\
         '\n    \n    <idx:iform name="subst:sg:inst" value="psem"/></idx:iform>' +\
         '\n    \n    <idx:iform name="subst:sg:loc" value="psie"/></idx:iform>' +\
         '\n    \n    <idx:iform name="subst:pl:dat" value="psom"/></idx:iform>' +\
-        '\n    \n    <idx:iform name="subst:pl:nom" value="psowie"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="subst:pl:nom.voc" value="psowie"/></idx:iform>' +\
         '\n    \n    <idx:iform name="subst:sg:dat" value="psu"/></idx:iform>' +\
-        '\n    \n    <idx:iform name="subst:pl:nom" value="psy"/></idx:iform>' +\
-        '\n    \n    <idx:iform name="subst:pl:gen" value="psów"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="subst:pl:nom.acc.voc" value="psy"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="subst:pl:gen.acc" value="psów"/></idx:iform>' +\
         '\n    </idx:infl>' +\
         '\n    </idx:orth>' +\
         '\n    <div><i>Noun</i></div>' +\
@@ -337,3 +337,95 @@ def test_lemma_generate_lemma_html_entry():
         '\n    ' +\
         '\n    </idx:short>' +\
         '\n    </idx:entry>\n    '
+
+
+def test_lemma_generate_verb_lemma_html_entry():
+    entry = TEST_VERB_W_CONJ_ENTRY
+    lemma = build_lemma_from_corpus_entry(entry)
+    assert lemma.generate_lemma_html_entry() == '\n    <idx:entry name="Polish" scriptable="yes" spell="yes">' +\
+        '\n    <idx:short><a id="0"></a>' +\
+        '\n    <idx:orth><b>mieć</b>' +\
+        '\n    <idx:infl>' +\
+        '\n    <idx:iform name="fin:sg:ter:imperf" value="ma"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="fin:pl:sec:imperf" value="macie"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="fin:pl:ter:imperf" value="mają"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pcon:imperf" value="mając"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pact:sg:nom.voc:f:imperf:aff" value="mająca"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pact:pl:nom.acc.voc:m2.m3.f.n:imperf:aff" value="mające"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pact:sg:acc:m1.m2:imperf:aff" value="mającego"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pact:sg:gen.dat.loc:f:imperf:aff" value="mającej"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pact:sg:dat:m1.m2.m3.n:imperf:aff" value="mającemu"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pacta" value="mająco"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pact:pl:nom.voc:imperf:aff" value="mający"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pact:pl:acc:imperf:aff" value="mających"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pact:pl:dat:m1.m2.m3.f.n:imperf:aff" value="mającym"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pact:pl:inst:m1.m2.m3.f.n:imperf:aff" value="mającymi"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="pact:sg:acc.inst:f:imperf:aff" value="mającą"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="fin:sg:pri:imperf" value="mam"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="fin:pl:pri:imperf" value="mamy"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="fin:sg:sec:imperf" value="masz"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ppas:sg:nom.voc:f:imperf:aff" value="miana"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ppas:pl:nom.acc.voc:m2.m3.f.n:imperf:aff" value="miane"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ppas:sg:acc:m1.m2:imperf:aff" value="mianego"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ppas:sg:gen.dat.loc:f:imperf:aff" value="mianej"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ppas:sg:dat:m1.m2.m3.n:imperf:aff" value="mianemu"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ppas:pl:nom.voc:imperf:aff" value="miani"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="imps:imperf" value="miano"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ppas:sg:acc:imperf:aff" value="miany"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ppas:pl:acc:imperf:aff" value="mianych"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ppas:pl:dat:m1.m2.m3.f.n:imperf:aff" value="mianym"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ppas:pl:inst:m1.m2.m3.f.n:imperf:aff" value="mianymi"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ppas:sg:acc.inst:f:imperf:aff" value="mianą"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:sg:m1.m2.m3:ter:imperf" value="miał"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:sg:f:imperf" value="miała"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:sg:f:ter:imperf" value="miałaby"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:sg:f:pri:imperf" value="miałabym"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:sg:f:sec:imperf" value="miałabyś"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:sg:f:pri:imperf" value="miałam"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:sg:f:sec:imperf" value="miałaś"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:sg:m1.m2.m3:ter:imperf" value="miałby"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:sg:m1.m2.m3:pri:imperf" value="miałbym"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:sg:m1.m2.m3:sec:imperf" value="miałbyś"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:sg:m1.m2.m3:pri:imperf" value="miałem"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:sg:m1.m2.m3:sec:imperf" value="miałeś"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:sg:n:imperf" value="miało"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:sg:n:ter:imperf" value="miałoby"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:sg:n:pri:imperf" value="miałobym"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:sg:n:sec:imperf" value="miałobyś"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:sg:n:pri:imperf" value="miałom"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:sg:n:sec:imperf" value="miałoś"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:pl:m2.m3.f.n:imperf" value="miały"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:pl:m2.m3.f.n:ter:imperf" value="miałyby"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:pl:m2.m3.f.n:sec:imperf" value="miałybyście"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:pl:m2.m3.f.n:pri:imperf" value="miałybyśmy"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:pl:m2.m3.f.n:sec:imperf" value="miałyście"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:pl:m2.m3.f.n:pri:imperf" value="miałyśmy"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="impt:sg:sec:imperf" value="miej"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="impt:pl:sec:imperf" value="miejcie"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="impt:pl:pri:imperf" value="miejmy"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:pl:imperf" value="mieli"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:pl:ter:imperf" value="mieliby"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:pl:sec:imperf" value="mielibyście"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="cond:pl:pri:imperf" value="mielibyśmy"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:pl:sec:imperf" value="mieliście"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="praet:pl:pri:imperf" value="mieliśmy"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ger:pl:nom.acc:n:imperf:aff" value="mienia"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ger:pl:loc:n:imperf:aff" value="mieniach"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ger:pl:inst:n:imperf:aff" value="mieniami"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ger:sg:nom.acc:n:imperf:aff" value="mienie"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ger:sg:inst:n:imperf:aff" value="mieniem"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ger:pl:dat:n:imperf:aff" value="mieniom"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ger:sg:dat.loc:n:imperf:aff" value="mieniu"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="inf:imperf" value="mieć"/></idx:iform>' +\
+        '\n    \n    <idx:iform name="ger:pl:gen:n:imperf:aff" value="mień"/></idx:iform>' +\
+        '\n    </idx:infl>' +\
+        '\n    </idx:orth>' +\
+        '\n    <div><i>Verb</i></div>' +\
+        '\n    <div><ol>' +\
+        '\n    <li>to have</li>' +\
+        '\n    \n    <li>to be (for an age)</li>' +\
+        '\n    \n    <li>must, have to, need to</li>' +\
+        '\n    \n    <li>to feel something</li>' +\
+        '\n    </ol></div>' +\
+        '\n    \n    <div>frequentative form: <a href="">miewać</a></div>' +\
+        '\n    \n    \n    </idx:short>\n    </idx:entry>\n    '

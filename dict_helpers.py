@@ -148,7 +148,7 @@ class Lemma(object):
     <div>{aspect_tag} form: <a href="{other_id}">{other_aspect_headword}</a></div>
     """
 
-    MORFEUSZ_OBJ = morfeusz2.Morfeusz(expand_tags=True)
+    MORFEUSZ_OBJ = morfeusz2.Morfeusz(expand_tags=True, praet='composite')
 
     @property
     def definitions(self):
