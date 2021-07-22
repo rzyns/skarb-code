@@ -3,7 +3,7 @@
 
 <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
     <!-- Title and language. -->
-    <dc:title>Polski → English (v. 2.0)</dc:title>
+    <dc:title>Polski → English (v. 2.1)</dc:title>
     <dc:language>pl</dc:language>
 </metadata>
 
@@ -21,6 +21,23 @@
     <item id="DictBody10" media-type="application/xhtml+xml" href="PL_EN_dict10.html"></item>
     <item id="DictBody11" media-type="application/xhtml+xml" href="PL_EN_dict11.html"></item>
     <item id="DictBody12" media-type="application/xhtml+xml" href="PL_EN_dict12.html"></item>
+    <item id="DictBody13" media-type="application/xhtml+xml" href="PL_EN_dict13.html"></item>
+    <item id="DictBody14" media-type="application/xhtml+xml" href="PL_EN_dict14.html"></item>
+    <item id="DictBody15" media-type="application/xhtml+xml" href="PL_EN_dict15.html"></item>
+    <item id="DictBody16" media-type="application/xhtml+xml" href="PL_EN_dict16.html"></item>
+    <item id="DictBody17" media-type="application/xhtml+xml" href="PL_EN_dict17.html"></item>
+    <item id="DictBody18" media-type="application/xhtml+xml" href="PL_EN_dict18.html"></item>
+    <item id="DictBody19" media-type="application/xhtml+xml" href="PL_EN_dict19.html"></item>
+    <item id="DictBody20" media-type="application/xhtml+xml" href="PL_EN_dict20.html"></item>
+    <item id="DictBody21" media-type="application/xhtml+xml" href="PL_EN_dict21.html"></item>
+    <item id="DictBody22" media-type="application/xhtml+xml" href="PL_EN_dict22.html"></item>
+    <item id="DictBody23" media-type="application/xhtml+xml" href="PL_EN_dict23.html"></item>
+    <item id="DictBody24" media-type="application/xhtml+xml" href="PL_EN_dict24.html"></item>
+    <item id="DictBody25" media-type="application/xhtml+xml" href="PL_EN_dict25.html"></item>
+    <item id="DictBody26" media-type="application/xhtml+xml" href="PL_EN_dict26.html"></item>
+    <item id="DictBody27" media-type="application/xhtml+xml" href="PL_EN_dict27.html"></item>
+    <item id="DictBody28" media-type="application/xhtml+xml" href="PL_EN_dict28.html"></item>
+    <item id="DictBody29" media-type="application/xhtml+xml" href="PL_EN_dict29.html"></item>
     <item id="DictCover" media-type="image/jpeg" href="PL_EN_dict.jpeg"/>
 </manifest>
 
@@ -38,6 +55,23 @@
     <itemref idref="DictBody10"/>
     <itemref idref="DictBody11"/>
     <itemref idref="DictBody12"/>
+    <itemref idref="DictBody13"/>
+    <itemref idref="DictBody14"/>
+    <itemref idref="DictBody15"/>
+    <itemref idref="DictBody16"/>
+    <itemref idref="DictBody17"/>
+    <itemref idref="DictBody18"/>
+    <itemref idref="DictBody19"/>
+    <itemref idref="DictBody20"/>
+    <itemref idref="DictBody21"/>
+    <itemref idref="DictBody22"/>
+    <itemref idref="DictBody23"/>
+    <itemref idref="DictBody24"/>
+    <itemref idref="DictBody25"/>
+    <itemref idref="DictBody26"/>
+    <itemref idref="DictBody27"/>
+    <itemref idref="DictBody28"/>
+    <itemref idref="DictBody29"/>
 </spine>
 
 <!-- Necessary for creating dictionaries.

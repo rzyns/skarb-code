@@ -70,7 +70,7 @@ SGJP_MORPH_CATEGORY_MAPPING = {
     "przym.": "adj"
 }
 MACHINE_TRANSLATED_MESSAGE = "<div><i>Translation generated with Google Cloud Translate API</i></div>"
-SAFE_DICT_CHUNK = 25000
+SAFE_DICT_CHUNK = 10000
 
 
 def chunks(lst, n):
@@ -148,7 +148,7 @@ class Lemma(object):
     <div>{aspect_tag} form: <a href="{other_id}">{other_aspect_headword}</a></div>
     """
 
-    MORFEUSZ_OBJ = morfeusz2.Morfeusz(expand_tags=True, praet='composite')
+    MORFEUSZ_OBJ = morfeusz2.Morfeusz(expand_tags=False, praet='composite')
 
     @property
     def definitions(self):
@@ -267,7 +267,9 @@ class Lemma(object):
 
     def generate_lemma_html_entry(self, lemma_verb_dict={}):
         verb_aspect_str = ""
-        form, tag, alternative_aspect_id = self.find_alternative_aspect()
+        form, tag, alternative_aspect_id = self.find_alternative_aspect(
+            lemma_verb_dict
+        )
         if form and tag:
             verb_aspect_str = self.DICTIONARY_VERB_ASPECT_ENTRY_TEMPLATE.format(
                 aspect_tag=tag,
@@ -417,7 +419,9 @@ def create_html_dictionary(create_with_stats=False, write=True):
         all_html_lemmas = []
         str_index = str(i)
         for lemma in tqdm(chunk, desc="Generating HTML entries for chunk {}...".format(str_index)):
-            lemma_html = lemma.generate_lemma_html_entry(lemma_verb_dict)
+            lemma_html = lemma.generate_lemma_html_entry(
+                lemma_verb_dict=lemma_verb_dict
+            )
             all_html_lemmas.append(lemma_html)
         dict_contents = DICTIONARY_BODY_TEMPLATE.format(
             dict_body="<hr>".join(all_html_lemmas)

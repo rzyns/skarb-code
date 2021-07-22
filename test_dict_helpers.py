@@ -1,5 +1,6 @@
 from dict_helpers import (
     build_lemma_from_corpus_entry,
+    build_verb_lemma_dictionary,
     check_lemma_is_invalid,
     DISCARDED_INVALID_POS_VARNAME,
     DISCARDED_DERIVED_VARNAME,
@@ -305,6 +306,17 @@ def test_lemma_definitions():
             "derived_from": "pies"
         },
     ]
+
+
+def test_find_correct_linked_aspect_entry():
+    entry1 = TEST_VERB_W_SYNONYMS_ENTRY
+    lemma1 = build_lemma_from_corpus_entry(entry1)
+    entry2 = TEST_FULL_NOUN_ENTRY
+    lemma2 = build_lemma_from_corpus_entry(entry2)
+    lemma_verb_dict = build_verb_lemma_dictionary([lemma1, lemma2])
+
+    assert lemma1.find_alternative_aspect(lemma_verb_dict) == ('podjąć', 'perfective', '')
+    assert lemma2.find_alternative_aspect(lemma_verb_dict) == ('', '', '')
 
 
 def test_lemma_generate_noun_lemma_html_entry():
