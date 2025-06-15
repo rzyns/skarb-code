@@ -1,0 +1,24 @@
+[project]
+name = "skarb-code"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "attrs==20.3.0",
+    "importlib-metadata==3.7.3",
+    "iniconfig==1.1.1",
+    "morfeusz2",
+    "packaging==20.9",
+    "pluggy==0.13.1",
+    "py==1.10.0",
+    "pyparsing==2.4.7",
+    "pytest==6.2.2",
+    "toml==0.10.2",
+    "tqdm==4.59.0",
+    "typing-extensions==3.7.4.3",
+    "zipp==3.4.1",
+]
+
+[tool.uv.sources]
+morfeusz2 = { path = "morfeusz2-1.99.1-20210718-cp35.cp36.cp37.cp38.cp39-abi3-linux_x86_64.whl" }
